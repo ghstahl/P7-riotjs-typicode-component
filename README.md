@@ -1,1 +1,1 @@
-# webpack2-riotjs-typicode-component
+# P7-riotjs-typicode-component
