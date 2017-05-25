@@ -1,0 +1,1 @@
+# webpack2-riotjs-typicode-component
