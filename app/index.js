@@ -1,5 +1,3 @@
-// the hosting riot spa will put riot in the global window namespace.
-var riot = window.riot;
 import './css/index.css';
 import TypicodeUserStore 			from 	'./stores/typicode-user-store.js';
 import RouteContributionStore 		from 	'./stores/route-contribution-store.js';

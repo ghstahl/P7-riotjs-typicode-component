@@ -384,10 +384,6 @@ __webpack_require__(3);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-// the hosting riot spa will put riot in the global window namespace.
-var riot = window.riot;
-
-
 var registerRecord = {
 	name: 'typicode-component',
 	stores: [{ store: new _typicodeUserStore2.default() }, { store: new _routeContributionStore2.default() }],
