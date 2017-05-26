@@ -1,4 +1,5 @@
 const webpack = require('webpack');
+const ExtractTextPlugin = require("extract-text-webpack-plugin");
 var path = require('path');
  
 module.exports = {
@@ -11,7 +12,8 @@ module.exports = {
   externals: {
 	  $: 'jQuery',
 	  jquery: 'jQuery',
-	  riot: 'riot'
+	  riot: 'riot',
+	  'style-loader':'style-loader'
 	},
   module:{
 	rules: [
@@ -25,7 +27,10 @@ module.exports = {
       	},
 	  	{
 	    	test: /\.css$/,
-	    	use: [ 'style-loader', 'css-loader' ]
+	    	use: ExtractTextPlugin.extract({
+	          fallback: "style-loader",
+	          use: "css-loader"
+	        })
 		},
 		{
 			test: /\.(png|woff|woff2|eot|ttf|svg)$/,
@@ -44,7 +49,7 @@ module.exports = {
 	]
   },
   plugins:[
-	
+	new ExtractTextPlugin("styles.css")
   ]
   
 };

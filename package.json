@@ -21,6 +21,7 @@
     "babel-preset-es2015-riot": "^1.1.0",
     "cpx": "^1.5.0",
     "css-loader": "^0.28.2",
+    "extract-text-webpack-plugin": "^2.1.0",
     "file-loader": "^0.11.1",
     "loader-utils": "^1.1.0",
     "npm-run-all": "^4.0.2",
