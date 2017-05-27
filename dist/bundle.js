@@ -91,9 +91,7 @@ var RouteContributionStore = function () {
 
     var self = this;
     self.name = "RouteContributionStore";
-    riot.observable(self);
     self._initializeViewSet();
-    self.bindEvents();
   }
 
   RouteContributionStore.prototype._initializeViewSet = function _initializeViewSet() {
@@ -107,13 +105,16 @@ var RouteContributionStore = function () {
     self.defaultRoute = '/my-component-page/home';
   };
 
-  RouteContributionStore.prototype.bindEvents = function bindEvents() {
+  RouteContributionStore.prototype.uninitialize = function uninitialize() {};
+
+  RouteContributionStore.prototype.initialize = function initialize() {
     var self = this;
+    riot.observable(self);
     self.on(riot.EVT.router.out.contributeRoutes, function (r) {
       console.log(self.name, riot.EVT.router.out.contributeRoutes, r);
       r('/my-component-page/typicode-user-detail?id=*', function () {
         console.log('route handler of /my-component-page/typicode-user-detail');
-        riot.control.trigger(riot.EVT.loadView, 'mpc-typicode-user-detail');
+        riot.control.trigger(riot.EVT.routeStore.in.riotRouteLoadView, 'mpc-typicode-user-detail');
       });
 
       r('/my-component-page/*', function (name) {
@@ -122,7 +123,7 @@ var RouteContributionStore = function () {
         if (self.views.indexOf(view) === -1) {
           riot.control.trigger(riot.EVT.routeStore.in.routeDispatch, self.defaultRoute);
         } else {
-          riot.control.trigger(riot.EVT.loadView, 'mpc-' + view);
+          riot.control.trigger(riot.EVT.routeStore.in.riotRouteLoadView, 'mpc-' + view);
         }
       });
       r('/my-component-page..', function () {
@@ -162,26 +163,53 @@ function TypicodeUserStore() {
             typicodeUserChanged: 'typicode-user-changed'
         }
     };
-    riot.observable(self); // Riot provides our event emitter.
 
     self.fetchException = null;
 
-    self.on(riot.EVT.app.out.appMount, function () {
-        console.log(riot.EVT.app.out.appMount, self.name);
-        riot.control.on(riot.EVT.typicodeUserStore.in.typicodeUsersFetchResult, self.onUsersResult);
-    });
-    self.on(riot.EVT.app.out.appUnmount, function () {
-        console.log(riot.EVT.app.out.appUnmount, self.name);
-        riot.control.off(riot.EVT.typicodeUserStore.in.typicodeUsersFetchResult, self.onUsersResult);
-    });
-    self.on(riot.EVT.typicodeUserStore.in.typicodeInit, function () {
-        console.log(riot.EVT.typicodeUserStore.in.typicodeInit, self.name);
-        riot.control.on(riot.EVT.typicodeUserStore.in.typicodeUsersFetchResult, self.onUsersResult);
-    });
-    self.on(riot.EVT.typicodeUserStore.in.typicodeUninit, function () {
-        console.log(riot.EVT.typicodeUserStore.in.typicodeUninit, self.name);
-        riot.control.off(riot.EVT.typicodeUserStore.in.typicodeUsersFetchResult, self.onUsersResult);
-    });
+    self.onTypicodeUsersFetch = function (query) {
+        console.log(riot.EVT.typicodeUserStore.in.typicodeUsersFetch);
+        var url = 'https://jsonplaceholder.typicode.com/users';
+        var trigger = {
+            name: riot.EVT.typicodeUserStore.in.typicodeUsersFetchResult
+        };
+        if (query) {
+            trigger.query = query;
+        }
+
+        riot.control.trigger(riot.EVT.fetchStore.in.fetch, url, null, trigger);
+    };
+    self.onTypicodeUserFetch = function (query) {
+        console.log(riot.EVT.typicodeUserStore.in.typicodeUserFetch);
+        var restoredSession = JSON.parse(localStorage.getItem(user_cache));
+        if (restoredSession) {
+            var result = restoredSession.filter(function (obj) {
+                return obj.id == query.id;
+            });
+            if (result && result.length > 0) {
+                self.trigger(riot.EVT.typicodeUserStore.out.typicodeUserChanged, result[0]);
+            }
+        } else {
+            // need to fetch.
+            var myQuery = {
+                type: 'riotControlTrigger',
+                evt: riot.EVT.typicodeUserStore.in.typicodeUserFetch,
+                query: query
+            };
+            riot.control.trigger(riot.EVT.typicodeUserStore.in.typicodeUsersFetch, myQuery);
+        }
+    };
+
+    self.uninitialize = function () {
+        self.off(riot.EVT.typicodeUserStore.in.typicodeUsersFetch, self.onTypicodeUsersFetch);
+        self.off(riot.EVT.typicodeUserStore.in.typicodeUserFetch, self.onTypicodeUserFetch);
+        self.off(riot.EVT.typicodeUserStore.in.typicodeUsersFetchResult, self.onUsersResult);
+        riot.EVT.typicodeUserStore = null;
+    }, self.initialize = function () {
+        riot.observable(self); // Riot provides our event emitter.
+        self.on(riot.EVT.typicodeUserStore.in.typicodeUsersFetchResult, self.onUsersResult);
+        self.on(riot.EVT.typicodeUserStore.in.typicodeUsersFetch, self.onTypicodeUsersFetch);
+        self.on(riot.EVT.typicodeUserStore.in.typicodeUserFetch, self.onTypicodeUserFetch);
+    };
 
     /**
      * Reset tag attributes to hide the errors and cleaning the results list
@@ -209,40 +237,6 @@ function TypicodeUserStore() {
             riot.control.trigger('ErrorStore:error-catch-all', { code: 'typeicode-143523' });
         }
     };
-
-    self.on(riot.EVT.typicodeUserStore.in.typicodeUsersFetch, function (query) {
-        console.log(riot.EVT.typicodeUserStore.in.typicodeUsersFetch);
-        var url = 'https://jsonplaceholder.typicode.com/users';
-        var trigger = {
-            name: riot.EVT.typicodeUserStore.in.typicodeUsersFetchResult
-        };
-        if (query) {
-            trigger.query = query;
-        }
-
-        riot.control.trigger(riot.EVT.fetchStore.in.fetch, url, null, trigger);
-    });
-
-    self.on(riot.EVT.typicodeUserStore.in.typicodeUserFetch, function (query) {
-        console.log(riot.EVT.typicodeUserStore.in.typicodeUserFetch);
-        var restoredSession = JSON.parse(localStorage.getItem(user_cache));
-        if (restoredSession) {
-            var result = restoredSession.filter(function (obj) {
-                return obj.id == query.id;
-            });
-            if (result && result.length > 0) {
-                self.trigger(riot.EVT.typicodeUserStore.out.typicodeUserChanged, result[0]);
-            }
-        } else {
-            // need to fetch.
-            var myQuery = {
-                type: 'riotControlTrigger',
-                evt: riot.EVT.typicodeUserStore.in.typicodeUserFetch,
-                query: query
-            };
-            riot.control.trigger(riot.EVT.typicodeUserStore.in.typicodeUsersFetch, myQuery);
-        }
-    });
 
     // The store emits change events to any listening views, so that they may react and redraw themselves.
 }

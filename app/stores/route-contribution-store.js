@@ -3,9 +3,7 @@ class RouteContributionStore{
   constructor(){
     var self = this;
     self.name = "RouteContributionStore";
-    riot.observable(self);
     self._initializeViewSet();
-    self.bindEvents();
   }
 
   _initializeViewSet(){
@@ -18,13 +16,15 @@ class RouteContributionStore{
     self.views = Array.from(s);
     self.defaultRoute = '/my-component-page/home';
   }
-  bindEvents(){
+  uninitialize(){}
+  initialize(){
     var self = this;
+    riot.observable(self);
     self.on(riot.EVT.router.out.contributeRoutes, (r) => {
       console.log(self.name,riot.EVT.router.out.contributeRoutes,r)
       r('/my-component-page/typicode-user-detail?id=*', ()=>{
         console.log('route handler of /my-component-page/typicode-user-detail'  )
-        riot.control.trigger(riot.EVT.loadView,'mpc-typicode-user-detail');
+        riot.control.trigger(riot.EVT.routeStore.in.riotRouteLoadView,'mpc-typicode-user-detail');
       });
 
       r('/my-component-page/*', (name)=>{
@@ -33,7 +33,7 @@ class RouteContributionStore{
         if(self.views.indexOf(view) === -1){
           riot.control.trigger(riot.EVT.routeStore.in.routeDispatch,self.defaultRoute);
         }else{
-          riot.control.trigger(riot.EVT.loadView,'mpc-'+view);
+          riot.control.trigger(riot.EVT.routeStore.in.riotRouteLoadView,'mpc-'+view);
         }
       });
       r('/my-component-page..', ()=>{
