@@ -90,14 +90,17 @@ var RouteContributionStore = function () {
     _classCallCheck(this, RouteContributionStore);
 
     var self = this;
-    self.name = "RouteContributionStore";
+
+    self.name = 'RouteContributionStore';
     self._initializeViewSet();
   }
 
   RouteContributionStore.prototype._initializeViewSet = function _initializeViewSet() {
     var self = this;
+
     self._viewsSet = new Set();
     var s = self._viewsSet;
+
     s.add('home');
     s.add('my-component-page');
     s.add('typicode-user-detail');
@@ -109,6 +112,7 @@ var RouteContributionStore = function () {
 
   RouteContributionStore.prototype.initialize = function initialize() {
     var self = this;
+
     riot.observable(self);
     self.on(riot.EVT.router.out.contributeRoutes, function (r) {
       console.log(self.name, riot.EVT.router.out.contributeRoutes, r);
@@ -120,6 +124,7 @@ var RouteContributionStore = function () {
       r('/my-component-page/*', function (name) {
         console.log('route handler of /my-component-page/' + name);
         var view = name;
+
         if (self.views.indexOf(view) === -1) {
           riot.control.trigger(riot.EVT.routeStore.in.routeDispatch, self.defaultRoute);
         } else {
@@ -145,102 +150,124 @@ exports.default = RouteContributionStore;
 "use strict";
 
 
-var user_cache = 'typicodeUserCache';
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 
-function TypicodeUserStore() {
-    var self = this;
-    self.name = 'TypicodeUserStore';
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var userCache = 'typicodeUserCache';
+
+var TypicodeUserStore = function () {
+  function TypicodeUserStore() {
+    _classCallCheck(this, TypicodeUserStore);
+
+    riot.observable(this); // Riot provides our event emitter.
+    this.name = 'TypicodeUserStore';
     riot.EVT.typicodeUserStore = {
-        in: {
-            typicodeInit: 'typicode-init',
-            typicodeUninit: 'typicode-uninit',
-            typicodeUsersFetchResult: 'typicode-users-fetch-result',
-            typicodeUsersFetch: 'typicode-users-fetch',
-            typicodeUserFetch: 'typicode-user-fetch'
-        },
-        out: {
-            typicodeUsersChanged: 'typicode-users-changed',
-            typicodeUserChanged: 'typicode-user-changed'
-        }
+      in: {
+        typicodeInit: 'typicode-init',
+        typicodeUninit: 'typicode-uninit',
+        typicodeUsersFetchResult: 'typicode-users-fetch-result',
+        typicodeUsersFetch: 'typicode-users-fetch',
+        typicodeUserFetch: 'typicode-user-fetch'
+      },
+      out: {
+        typicodeUsersChanged: 'typicode-users-changed',
+        typicodeUserChanged: 'typicode-user-changed'
+      }
     };
 
-    self.fetchException = null;
+    this.fetchException = null;
+  }
 
-    self.onTypicodeUsersFetch = function (query) {
-        console.log(riot.EVT.typicodeUserStore.in.typicodeUsersFetch);
-        var url = 'https://jsonplaceholder.typicode.com/users';
-        var trigger = {
-            name: riot.EVT.typicodeUserStore.in.typicodeUsersFetchResult
-        };
-        if (query) {
-            trigger.query = query;
-        }
-
-        riot.control.trigger(riot.EVT.fetchStore.in.fetch, url, null, trigger);
-    };
-    self.onTypicodeUserFetch = function (query) {
-        console.log(riot.EVT.typicodeUserStore.in.typicodeUserFetch);
-        var restoredSession = JSON.parse(localStorage.getItem(user_cache));
-        if (restoredSession) {
-            var result = restoredSession.filter(function (obj) {
-                return obj.id == query.id;
-            });
-            if (result && result.length > 0) {
-                self.trigger(riot.EVT.typicodeUserStore.out.typicodeUserChanged, result[0]);
-            }
-        } else {
-            // need to fetch.
-            var myQuery = {
-                type: 'riotControlTrigger',
-                evt: riot.EVT.typicodeUserStore.in.typicodeUserFetch,
-                query: query
-            };
-            riot.control.trigger(riot.EVT.typicodeUserStore.in.typicodeUsersFetch, myQuery);
-        }
+  TypicodeUserStore.prototype._onTypicodeUsersFetch = function _onTypicodeUsersFetch(query) {
+    console.log(riot.EVT.typicodeUserStore.in.typicodeUsersFetch);
+    var url = 'https://jsonplaceholder.typicode.com/users';
+    var trigger = {
+      name: riot.EVT.typicodeUserStore.in.typicodeUsersFetchResult
     };
 
-    self.uninitialize = function () {
-        self.off(riot.EVT.typicodeUserStore.in.typicodeUsersFetch, self.onTypicodeUsersFetch);
-        self.off(riot.EVT.typicodeUserStore.in.typicodeUserFetch, self.onTypicodeUserFetch);
-        self.off(riot.EVT.typicodeUserStore.in.typicodeUsersFetchResult, self.onUsersResult);
-        riot.EVT.typicodeUserStore = null;
-    }, self.initialize = function () {
-        riot.observable(self); // Riot provides our event emitter.
-        self.on(riot.EVT.typicodeUserStore.in.typicodeUsersFetchResult, self.onUsersResult);
-        self.on(riot.EVT.typicodeUserStore.in.typicodeUsersFetch, self.onTypicodeUsersFetch);
-        self.on(riot.EVT.typicodeUserStore.in.typicodeUserFetch, self.onTypicodeUserFetch);
-    };
+    if (query) {
+      trigger.query = query;
+    }
 
-    /**
+    riot.control.trigger(riot.EVT.fetchStore.in.fetch, url, null, trigger);
+  };
+
+  TypicodeUserStore.prototype._onTypicodeUserFetch = function _onTypicodeUserFetch(query) {
+    console.log(riot.EVT.typicodeUserStore.in.typicodeUserFetch);
+    var restoredSession = JSON.parse(localStorage.getItem(userCache));
+
+    if (restoredSession) {
+      var result = restoredSession.filter(function (obj) {
+        return obj.id === query.id;
+      });
+
+      if (result && result.length > 0) {
+        this.trigger(riot.EVT.typicodeUserStore.out.typicodeUserChanged, result[0]);
+      }
+    } else {
+      // need to fetch.
+      var myQuery = {
+        type: 'riotControlTrigger',
+        evt: riot.EVT.typicodeUserStore.in.typicodeUserFetch,
+        query: query
+      };
+
+      riot.control.trigger(riot.EVT.typicodeUserStore.in.typicodeUsersFetch, myQuery);
+    }
+  };
+
+  TypicodeUserStore.prototype.uninitialize = function uninitialize() {
+    this.off(riot.EVT.typicodeUserStore.in.typicodeUsersFetch, this._onTypicodeUsersFetch);
+    this.off(riot.EVT.typicodeUserStore.in.typicodeUserFetch, this._onTypicodeUserFetch);
+    this.off(riot.EVT.typicodeUserStore.in.typicodeUsersFetchResult, this._onUsersResult);
+    riot.EVT.typicodeUserStore = null;
+  };
+
+  TypicodeUserStore.prototype.initialize = function initialize() {
+
+    this.on(riot.EVT.typicodeUserStore.in.typicodeUsersFetchResult, this._onUsersResult);
+    this.on(riot.EVT.typicodeUserStore.in.typicodeUsersFetch, this._onTypicodeUsersFetch);
+    this.on(riot.EVT.typicodeUserStore.in.typicodeUserFetch, this._onTypicodeUserFetch);
+  };
+
+  /**
      * Reset tag attributes to hide the errors and cleaning the results list
      */
-    self.resetData = function () {
-        self.fetchException = null;
-    };
 
-    self.onUsersResult = function (result, myTrigger) {
-        console.log(riot.EVT.typicodeUserStore.in.typicodeUsersFetchResult, result, myTrigger);
-        if (result.error == null && result.response.ok && result.json) {
-            // good
-            var data = result.json;
-            riot.control.trigger(riot.EVT.localStorageStore.in.localstorageSet, { key: user_cache, data: data });
-            self.trigger(riot.EVT.typicodeUserStore.out.typicodeUsersChanged, data);
-            if (myTrigger.query) {
-                var query = myTrigger.query;
-                if (query.type == 'riotControlTrigger') {
-                    riot.control.trigger(query.evt, query.query);
-                }
-            }
-        } else {
-            // Bad.. Wipe the local storage
-            riot.control.trigger(riot.EVT.localStorageStore.in.localstorageRemove, { key: user_cache });
-            riot.control.trigger('ErrorStore:error-catch-all', { code: 'typeicode-143523' });
+
+  TypicodeUserStore.prototype._resetData = function _resetData() {
+    this.fetchException = null;
+  };
+
+  TypicodeUserStore.prototype._onUsersResult = function _onUsersResult(result, myTrigger) {
+    console.log(riot.EVT.typicodeUserStore.in.typicodeUsersFetchResult, result, myTrigger);
+    if (result.error == null && result.response.ok && result.json) {
+      // good
+      var data = result.json;
+
+      riot.control.trigger(riot.EVT.localStorageStore.in.localstorageSet, { key: userCache, data: data });
+      this.trigger(riot.EVT.typicodeUserStore.out.typicodeUsersChanged, data);
+      if (myTrigger.query) {
+        var query = myTrigger.query;
+
+        if (query.type === 'riotControlTrigger') {
+          riot.control.trigger(query.evt, query.query);
         }
-    };
+      }
+    } else {
+      // Bad.. Wipe the local storage
+      riot.control.trigger(riot.EVT.localStorageStore.in.localstorageRemove, { key: userCache });
+      riot.control.trigger('ErrorStore:error-catch-all', { code: 'typeicode-143523' });
+    }
+  };
 
-    // The store emits change events to any listening views, so that they may react and redraw themselves.
-}
-if (true) module.exports = TypicodeUserStore;
+  return TypicodeUserStore;
+}();
+
+exports.default = TypicodeUserStore;
 
 /***/ }),
 /* 3 */
@@ -335,6 +362,8 @@ riot.tag2('mpc-typicode-user-detail', '<div if="{result != null}" class="panel p
 "use strict";
 
 
+__webpack_require__(0);
+
 __webpack_require__(6);
 
 var _typicodeUserStore = __webpack_require__(2);
@@ -354,10 +383,10 @@ __webpack_require__(3);
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 var registerRecord = {
-	name: 'typicode-component',
-	stores: [{ store: new _typicodeUserStore2.default() }, { store: new _routeContributionStore2.default() }],
-	postLoadEvents: [{ event: 'typicode-init', data: {} }],
-	preUnloadEvents: [{ event: 'typicode-uninit', data: {} }]
+  name: 'typicode-component',
+  stores: [{ store: new _typicodeUserStore2.default() }, { store: new _routeContributionStore2.default() }],
+  postLoadEvents: [{ event: 'typicode-init', data: {} }],
+  preUnloadEvents: [{ event: 'typicode-uninit', data: {} }]
 };
 
 riot.control.trigger('plugin-registration', registerRecord);

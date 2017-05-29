@@ -1,33 +1,34 @@
 const webpack = require('webpack');
-const ExtractTextPlugin = require("extract-text-webpack-plugin");
+const ExtractTextPlugin = require('extract-text-webpack-plugin');
 var path = require('path');
+
 module.exports = {
   entry: './app/index.js',
   output: {
     filename: 'bundle.min.js',
-    path: path.resolve(__dirname, 'dist') 
+    path: path.resolve(__dirname, 'dist')
   },
   externals: {
     $: 'jQuery',
     jquery: 'jQuery',
     riot: 'riot'
   },
-  module:{
+  module: {
     rules: [
       {
-            test: /\.tag$/,
-            exclude: /node_modules/,
-            enforce: "pre",
-            use:[
-              {loader: 'riot-tag-loader',options: {hot: false}}
-            ]
-          },
-        {
-          test: /\.css$/,
-          use: ExtractTextPlugin.extract({
-            fallback: "style-loader",
-            use: "css-loader"
-          })
+        test: /\.tag$/,
+        exclude: /node_modules/,
+        enforce: 'pre',
+        use: [
+              {loader: 'riot-tag-loader', options: {hot: false}}
+        ]
+      },
+      {
+        test: /\.css$/,
+        use: ExtractTextPlugin.extract({
+          fallback: 'style-loader',
+          use: 'css-loader'
+        })
       },
       {
         test: /\.(png|woff|woff2|eot|ttf|svg)$/,
@@ -39,9 +40,16 @@ module.exports = {
         use: {
           loader: 'babel-loader',
           options: {
-            presets: ['es2015','es2015-riot']
+            presets: ['es2015', 'es2015-riot']
           }
         }
+      },
+      {
+        test: /(\.jsx|\.js)$/,
+        use: [
+          'eslint-loader'
+        ],
+        exclude: /(node_modules|bower_components)/
       }
     ]
   },
@@ -61,6 +69,6 @@ module.exports = {
       },
       comments: false
     }),
-    new ExtractTextPlugin("styles.css")
+    new ExtractTextPlugin('styles.css')
   ]
-}
+};

@@ -12,8 +12,7 @@ module.exports = {
   externals: {
 	  $: 'jQuery',
 	  jquery: 'jQuery',
-	  riot: 'riot',
-	  'style-loader':'style-loader'
+	  riot: 'riot'
 	},
   module:{
 	rules: [
@@ -45,6 +44,13 @@ module.exports = {
 				  presets: ['es2015','es2015-riot']
 				}
 			}
+		},
+		{
+			test: /(\.jsx|\.js)$/,
+			use: [
+			  'eslint-loader'
+			],
+			exclude: /(node_modules|bower_components)/
 		}
 	]
   },
