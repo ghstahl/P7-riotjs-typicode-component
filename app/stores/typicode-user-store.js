@@ -41,9 +41,13 @@ export default class TypicodeUserStore {
     console.log(riot.EVT.typicodeUserStore.in.typicodeUserFetch);
     let restoredSession = JSON.parse(localStorage.getItem(userCache));
 
+    let id = parseInt(query.id, 10);  // query.id is a string
+
     if (restoredSession) {
       let result = restoredSession.filter(function (obj) {
-        return obj.id === query.id;
+        let found = obj.id === id;
+
+        return found;
       });
 
       if (result && result.length > 0) {

@@ -199,9 +199,13 @@ var TypicodeUserStore = function () {
     console.log(riot.EVT.typicodeUserStore.in.typicodeUserFetch);
     var restoredSession = JSON.parse(localStorage.getItem(userCache));
 
+    var id = parseInt(query.id, 10); // query.id is a string
+
     if (restoredSession) {
       var result = restoredSession.filter(function (obj) {
-        return obj.id === query.id;
+        var found = obj.id === id;
+
+        return found;
       });
 
       if (result && result.length > 0) {
