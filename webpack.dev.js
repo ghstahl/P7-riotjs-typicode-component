@@ -4,7 +4,7 @@ var path = require('path');
  
 module.exports = {
   entry: './app/index.js',
-  devtool: 'cheap-module-source-map',
+  devtool: 'source-map',
   output: {
    filename: 'bundle.js',
    path: path.resolve(__dirname, 'dist') 

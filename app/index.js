@@ -1,17 +1,17 @@
 import										'riot';
 import './css/index.css';
 import TypicodeUserStore 			from 	'./stores/typicode-user-store.js';
-import RouteContributionStore 		from 	'./stores/route-contribution-store.js';
-import 										'./pages/my-component-page.tag';
-import 										'./pages/typicode-user-detail.tag';
-import 										'./pages/home.tag';
+import RouteContributer 		from 	'./route-contributer.js';
 
-var registerRecord = {
+let rcs = new RouteContributer();
+let registerRecord = {
   name: 'typicode-component',
   stores: [
-		{store: new TypicodeUserStore()},
-		{store: new RouteContributionStore()}
+		{store: new TypicodeUserStore()}
   ],
+  registrants: {
+    routeContributer: rcs
+  },
   postLoadEvents: [
 		{event: 'typicode-init', data: {}}
   ],

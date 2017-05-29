@@ -21,6 +21,8 @@ export default class TypicodeUserStore {
     };
 
     this.fetchException = null;
+    this.bound = false;
+    this.initialize();
   }
 
   _onTypicodeUsersFetch(query) {
@@ -66,16 +68,22 @@ export default class TypicodeUserStore {
   }
 
   uninitialize() {
-    this.off(riot.EVT.typicodeUserStore.in.typicodeUsersFetch, this._onTypicodeUsersFetch);
-    this.off(riot.EVT.typicodeUserStore.in.typicodeUserFetch, this._onTypicodeUserFetch);
-    this.off(riot.EVT.typicodeUserStore.in.typicodeUsersFetchResult, this._onUsersResult);
-    riot.EVT.typicodeUserStore = null;
+    if (this.bound === true) {
+      this.off(riot.EVT.typicodeUserStore.in.typicodeUsersFetch, this._onTypicodeUsersFetch);
+      this.off(riot.EVT.typicodeUserStore.in.typicodeUserFetch, this._onTypicodeUserFetch);
+      this.off(riot.EVT.typicodeUserStore.in.typicodeUsersFetchResult, this._onUsersResult);
+
+      this.bound = !this.bound ;
+    }
   }
   initialize() {
+    if (this.bound === false) {
+      this.on(riot.EVT.typicodeUserStore.in.typicodeUsersFetchResult, this._onUsersResult);
+      this.on(riot.EVT.typicodeUserStore.in.typicodeUsersFetch, this._onTypicodeUsersFetch);
+      this.on(riot.EVT.typicodeUserStore.in.typicodeUserFetch, this._onTypicodeUserFetch);
 
-    this.on(riot.EVT.typicodeUserStore.in.typicodeUsersFetchResult, this._onUsersResult);
-    this.on(riot.EVT.typicodeUserStore.in.typicodeUsersFetch, this._onTypicodeUsersFetch);
-    this.on(riot.EVT.typicodeUserStore.in.typicodeUserFetch, this._onTypicodeUserFetch);
+      this.bound = !this.bound ;
+    }
   }
 
   /**
