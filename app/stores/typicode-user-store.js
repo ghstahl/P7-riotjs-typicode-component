@@ -22,7 +22,7 @@ export default class TypicodeUserStore {
 
     this.fetchException = null;
     this.bound = false;
-    this.initialize();
+    this.bind();
   }
 
   _onTypicodeUsersFetch(query) {
@@ -67,7 +67,7 @@ export default class TypicodeUserStore {
     }
   }
 
-  uninitialize() {
+  unbind() {
     if (this.bound === true) {
       this.off(riot.EVT.typicodeUserStore.in.typicodeUsersFetch, this._onTypicodeUsersFetch);
       this.off(riot.EVT.typicodeUserStore.in.typicodeUserFetch, this._onTypicodeUserFetch);
@@ -76,7 +76,7 @@ export default class TypicodeUserStore {
       this.bound = !this.bound ;
     }
   }
-  initialize() {
+  bind() {
     if (this.bound === false) {
       this.on(riot.EVT.typicodeUserStore.in.typicodeUsersFetchResult, this._onUsersResult);
       this.on(riot.EVT.typicodeUserStore.in.typicodeUsersFetch, this._onTypicodeUsersFetch);

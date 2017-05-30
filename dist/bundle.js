@@ -188,7 +188,7 @@ var TypicodeUserStore = function () {
 
     this.fetchException = null;
     this.bound = false;
-    this.initialize();
+    this.bind();
   }
 
   TypicodeUserStore.prototype._onTypicodeUsersFetch = function _onTypicodeUsersFetch(query) {
@@ -233,7 +233,7 @@ var TypicodeUserStore = function () {
     }
   };
 
-  TypicodeUserStore.prototype.uninitialize = function uninitialize() {
+  TypicodeUserStore.prototype.unbind = function unbind() {
     if (this.bound === true) {
       this.off(riot.EVT.typicodeUserStore.in.typicodeUsersFetch, this._onTypicodeUsersFetch);
       this.off(riot.EVT.typicodeUserStore.in.typicodeUserFetch, this._onTypicodeUserFetch);
@@ -243,7 +243,7 @@ var TypicodeUserStore = function () {
     }
   };
 
-  TypicodeUserStore.prototype.initialize = function initialize() {
+  TypicodeUserStore.prototype.bind = function bind() {
     if (this.bound === false) {
       this.on(riot.EVT.typicodeUserStore.in.typicodeUsersFetchResult, this._onUsersResult);
       this.on(riot.EVT.typicodeUserStore.in.typicodeUsersFetch, this._onTypicodeUsersFetch);
@@ -323,8 +323,7 @@ var registerRecord = {
   registrants: {
     routeContributer: rcs
   },
-  postLoadEvents: [{ event: 'typicode-init', data: {} }],
-  preUnloadEvents: [{ event: 'typicode-uninit', data: {} }]
+  postLoadEvents: [{ event: 'typicode-init', data: {} }]
 };
 
 riot.control.trigger('plugin-registration', registerRecord);
