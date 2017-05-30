@@ -18,5 +18,4 @@ let registerRecord = {
 };
 
 riot.control.trigger('plugin-registration', registerRecord);
-riot.control.trigger('component-load-complete', registerRecord.name);
 
