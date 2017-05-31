@@ -28,15 +28,15 @@ export default class TypicodeUserStore {
   _onTypicodeUsersFetch(query) {
     console.log(riot.EVT.typicodeUserStore.in.typicodeUsersFetch);
     let url = 'https://jsonplaceholder.typicode.com/users';
-    let trigger = {
-      name: riot.EVT.typicodeUserStore.in.typicodeUsersFetchResult
+    let myAck = {
+      evt: riot.EVT.typicodeUserStore.in.typicodeUsersFetchResult
     };
 
     if (query) {
-      trigger.query = query;
+      myAck.query = query;
     }
 
-    riot.control.trigger(riot.EVT.fetchStore.in.fetch, url, null, trigger);
+    riot.control.trigger(riot.EVT.fetchStore.in.fetch, url, null, myAck);
   }
 
   _onTypicodeUserFetch(query) {
@@ -93,16 +93,16 @@ export default class TypicodeUserStore {
     this.fetchException = null;
   };
 
-  _onUsersResult(result, myTrigger) {
-    console.log(riot.EVT.typicodeUserStore.in.typicodeUsersFetchResult, result, myTrigger);
+  _onUsersResult(result, ack) {
+    console.log(riot.EVT.typicodeUserStore.in.typicodeUsersFetchResult, result, ack);
     if (result.error == null && result.response.ok && result.json) {
             // good
       let data = result.json;
 
       riot.control.trigger(riot.EVT.localStorageStore.in.localstorageSet, {key: userCache, data: data});
       this.trigger(riot.EVT.typicodeUserStore.out.typicodeUsersChanged, data);
-      if (myTrigger.query) {
-        let query = myTrigger.query;
+      if (ack.query) {
+        let query = ack.query;
 
         if (query.type === 'riotControlTrigger') {
           riot.control.trigger(query.evt, query.query);

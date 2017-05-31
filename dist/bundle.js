@@ -194,15 +194,15 @@ var TypicodeUserStore = function () {
   TypicodeUserStore.prototype._onTypicodeUsersFetch = function _onTypicodeUsersFetch(query) {
     console.log(riot.EVT.typicodeUserStore.in.typicodeUsersFetch);
     var url = 'https://jsonplaceholder.typicode.com/users';
-    var trigger = {
-      name: riot.EVT.typicodeUserStore.in.typicodeUsersFetchResult
+    var myAck = {
+      evt: riot.EVT.typicodeUserStore.in.typicodeUsersFetchResult
     };
 
     if (query) {
-      trigger.query = query;
+      myAck.query = query;
     }
 
-    riot.control.trigger(riot.EVT.fetchStore.in.fetch, url, null, trigger);
+    riot.control.trigger(riot.EVT.fetchStore.in.fetch, url, null, myAck);
   };
 
   TypicodeUserStore.prototype._onTypicodeUserFetch = function _onTypicodeUserFetch(query) {
@@ -262,16 +262,16 @@ var TypicodeUserStore = function () {
     this.fetchException = null;
   };
 
-  TypicodeUserStore.prototype._onUsersResult = function _onUsersResult(result, myTrigger) {
-    console.log(riot.EVT.typicodeUserStore.in.typicodeUsersFetchResult, result, myTrigger);
+  TypicodeUserStore.prototype._onUsersResult = function _onUsersResult(result, ack) {
+    console.log(riot.EVT.typicodeUserStore.in.typicodeUsersFetchResult, result, ack);
     if (result.error == null && result.response.ok && result.json) {
       // good
       var data = result.json;
 
       riot.control.trigger(riot.EVT.localStorageStore.in.localstorageSet, { key: userCache, data: data });
       this.trigger(riot.EVT.typicodeUserStore.out.typicodeUsersChanged, data);
-      if (myTrigger.query) {
-        var query = myTrigger.query;
+      if (ack.query) {
+        var query = ack.query;
 
         if (query.type === 'riotControlTrigger') {
           riot.control.trigger(query.evt, query.query);
